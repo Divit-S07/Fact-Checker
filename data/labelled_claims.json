@@ -1,0 +1,14 @@
+[
+  {"claim": "Vaccines cause autism", "expected": "False"},
+  {"claim": "Drinking hot water cures viral infections", "expected": "False"},
+  {"claim": "The Great Wall of China is visible from space with the naked eye", "expected": "False"},
+  {"claim": "Humans only use 10 percent of their brains", "expected": "False"},
+  {"claim": "5G technology spreads COVID-19", "expected": "False"},
+  {"claim": "Lightning never strikes the same place twice", "expected": "False"},
+  {"claim": "The Earth revolves around the Sun", "expected": "True"},
+  {"claim": "Water boils at 100 degrees Celsius at sea level", "expected": "True"},
+  {"claim": "Climate change is primarily caused by human activity", "expected": "True"},
+  {"claim": "Eating carrots improves your night vision", "expected": "Misleading"},
+  {"claim": "Drinking eight glasses of water a day is a strict medical requirement for everyone", "expected": "Misleading"},
+  {"claim": "A secret committee will ban all home computers next month", "expected": "Unverifiable"}
+]

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FactGuard AI — Fact-Checker & Daily News Digest</title>
+  <meta name="description" content="AI-powered fact-checking pipeline with LangGraph. Verify claims, get evidence-backed verdicts, and read daily verified news digests." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+  <div class="bg-glow glow-3"></div>
+
+  <div class="app-shell">
+    <!-- ─── Sidebar ─── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="14" stroke="url(#lg1)" stroke-width="2"/>
+            <path d="M10 16l4 4 8-8" stroke="url(#lg2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="lg1" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#4f8ef7"/>
+                <stop offset="1" stop-color="#a855f7"/>
+              </linearGradient>
+              <linearGradient id="lg2" x1="10" y1="12" x2="22" y2="20" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#4ade80"/>
+                <stop offset="1" stop-color="#22d3ee"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <span class="logo-name">FactGuard</span>
+          <span class="logo-tag">AI</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-panel="fact-check" id="nav-fact-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Fact Checker
+        </button>
+        <button class="nav-item" data-panel="digest" id="nav-digest">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v12a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Daily Digest
+        </button>
+        <button class="nav-item" data-panel="history" id="nav-history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          History
+        </button>
+        <button class="nav-item" data-panel="sources" id="nav-sources">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+          Trusted Sources
+        </button>
+        <button class="nav-item" data-panel="stats" id="nav-stats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Statistics
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="pipeline-badge">
+          <div class="pipeline-dot"></div>
+          <span>LangGraph Pipeline</span>
+        </div>
+        <div class="api-status" id="api-status">
+          <div class="status-dot" id="status-dot"></div>
+          <span id="status-text">Checking...</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ─── Main Content ─── -->
+    <main class="main-content">
+
+      <!-- ═══ PANEL: Fact Checker ═══ -->
+      <section class="panel active" id="panel-fact-check">
+        <div class="panel-header">
+          <div>
+            <h1 class="panel-title">Fact Checker</h1>
+            <p class="panel-subtitle">Paste any claim or forwarded message — our AI pipeline will verify it with live evidence</p>
+          </div>
+          <div class="pipeline-flow">
+            <div class="pipe-node">Extract</div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-node">Search</div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-node">Judge</div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-node">Critic</div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-node">Digest</div>
+          </div>
+        </div>
+
+        <div class="input-card">
+          <label class="input-label" for="claim-input">Enter claim or paste forwarded message</label>
+          <div class="textarea-wrapper">
+            <textarea
+              id="claim-input"
+              class="claim-textarea"
+              placeholder="e.g. Is it true that drinking hot water cures viral infections?&#10;&#10;Or paste a full forwarded message to fact-check all claims within it..."
+              rows="5"
+            ></textarea>
+            <div class="char-count" id="char-count">0 / 2000</div>
+          </div>
+
+          <div class="input-actions">
+            <div class="quick-examples">
+              <span class="ex-label">Try:</span>
+              <button class="example-btn" data-text="Is it true that drinking hot water cures viral infections?">Hot water cures?</button>
+              <button class="example-btn" data-text="5G technology spreads COVID-19 through radio waves">5G & COVID</button>
+              <button class="example-btn" data-text="Vaccines cause autism in children">Vaccines myth</button>
+              <button class="example-btn" data-text="Humans only use 10% of their brain capacity">Brain 10%</button>
+            </div>
+            <button class="btn-primary" id="fact-check-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Fact-Check Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Pipeline Progress -->
+        <div class="pipeline-progress" id="pipeline-progress" style="display:none;">
+          <div class="progress-header">
+            <div class="spinner"></div>
+            <span id="progress-label">Initializing pipeline...</span>
+          </div>
+          <div class="progress-nodes">
+            <div class="prog-node" id="prog-extract">
+              <div class="prog-node-icon">📝</div>
+              <span>Claim Extractor</span>
+              <div class="prog-node-status"></div>
+            </div>
+            <div class="prog-connector"></div>
+            <div class="prog-node" id="prog-search">
+              <div class="prog-node-icon">🔍</div>
+              <span>Evidence Search</span>
+              <div class="prog-node-status"></div>
+            </div>
+            <div class="prog-connector"></div>
+            <div class="prog-node" id="prog-judge">
+              <div class="prog-node-icon">⚖️</div>
+              <span>Verdict Judge</span>
+              <div class="prog-node-status"></div>
+            </div>
+            <div class="prog-connector"></div>
+            <div class="prog-node" id="prog-critic">
+              <div class="prog-node-icon">🎯</div>
+              <span>Critic Review</span>
+              <div class="prog-node-status"></div>
+            </div>
+            <div class="prog-connector"></div>
+            <div class="prog-node" id="prog-digest">
+              <div class="prog-node-icon">📰</div>
+              <span>Digest Writer</span>
+              <div class="prog-node-status"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="fact-check-results" class="results-area"></div>
+      </section>
+
+      <!-- ═══ PANEL: Daily Digest ═══ -->
+      <section class="panel" id="panel-digest">
+        <div class="panel-header">
+          <div>
+            <h1 class="panel-title">Daily News Digest</h1>
+            <p class="panel-subtitle">Get today's verified news digest on any topic — AI-curated and fact-checked</p>
+          </div>
+        </div>
+
+        <div class="digest-controls">
+          <div class="topic-grid">
+            <button class="topic-btn active" data-topic="Technology">💻 Technology</button>
+            <button class="topic-btn" data-topic="Health">🏥 Health</button>
+            <button class="topic-btn" data-topic="Science">🔬 Science</button>
+            <button class="topic-btn" data-topic="Politics">🏛️ Politics</button>
+            <button class="topic-btn" data-topic="Business">📈 Business</button>
+            <button class="topic-btn" data-topic="Environment">🌍 Environment</button>
+            <button class="topic-btn" data-topic="Sports">⚽ Sports</button>
+            <button class="topic-btn custom-topic-btn" data-topic="custom">✏️ Custom Topic</button>
+          </div>
+          <div class="custom-topic-input" id="custom-topic-input" style="display:none;">
+            <input type="text" id="custom-topic-field" placeholder="Enter custom topic..." class="custom-field" />
+          </div>
+          <div class="digest-actions">
+            <label class="toggle-label">
+              <input type="checkbox" id="export-md-toggle" checked />
+              <span class="toggle-track"></span>
+              Export as Markdown
+            </label>
+            <button class="btn-primary" id="digest-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v12a2 2 0 01-2 2z"/></svg>
+              Generate Digest
+            </button>
+          </div>
+        </div>
+
+        <div class="pipeline-progress" id="digest-progress" style="display:none;">
+          <div class="progress-header">
+            <div class="spinner"></div>
+            <span id="digest-progress-label">Generating digest...</span>
+          </div>
+        </div>
+
+        <div id="digest-results" class="results-area"></div>
+      </section>
+
+      <!-- ═══ PANEL: History ═══ -->
+      <section class="panel" id="panel-history">
+        <div class="panel-header">
+          <div>
+            <h1 class="panel-title">Claim History</h1>
+            <p class="panel-subtitle">Browse all previously fact-checked claims and their verdicts</p>
+          </div>
+        </div>
+
+        <div class="history-filters">
+          <div class="filter-row">
+            <select class="filter-select" id="filter-verdict">
+              <option value="">All Verdicts</option>
+              <option value="True">✅ True</option>
+              <option value="False">❌ False</option>
+              <option value="Misleading">⚠️ Misleading</option>
+              <option value="Unverifiable">❓ Unverifiable</option>
+            </select>
+            <select class="filter-select" id="filter-topic">
+              <option value="">All Topics</option>
+              <option value="Health">Health</option>
+              <option value="Technology">Technology</option>
+              <option value="Science">Science</option>
+              <option value="Politics">Politics</option>
+              <option value="Business">Business</option>
+            </select>
+            <input type="date" class="filter-date" id="filter-start" />
+            <input type="date" class="filter-date" id="filter-end" />
+            <button class="btn-secondary" id="filter-apply">Apply Filters</button>
+            <button class="btn-secondary" id="filter-week">This Week</button>
+            <button class="btn-ghost" id="filter-reset">Reset</button>
+          </div>
+        </div>
+
+        <div id="history-results" class="results-area">
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <p>No claims in history yet. Start fact-checking!</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ PANEL: Trusted Sources ═══ -->
+      <section class="panel" id="panel-sources">
+        <div class="panel-header">
+          <div>
+            <h1 class="panel-title">Trusted Sources</h1>
+            <p class="panel-subtitle">Our credibility registry of vetted sources used for fact-checking</p>
+          </div>
+        </div>
+        <div id="sources-grid" class="sources-grid"></div>
+      </section>
+
+      <!-- ═══ PANEL: Statistics ═══ -->
+      <section class="panel" id="panel-stats">
+        <div class="panel-header">
+          <div>
+            <h1 class="panel-title">Statistics</h1>
+            <p class="panel-subtitle">Overview of your fact-checking activity</p>
+          </div>
+        </div>
+        <div id="stats-area" class="stats-grid"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Markdown Modal -->
+  <div class="modal-overlay" id="md-modal" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📄 Exported Markdown</h3>
+        <button class="modal-close" id="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <pre id="md-preview" class="md-preview"></pre>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="copy-md">Copy to Clipboard</button>
+        <button class="btn-primary" id="download-md">Download .md</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
